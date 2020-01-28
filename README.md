@@ -1,1 +1,1 @@
-# Pendulum-Project
+# PendulumProject
