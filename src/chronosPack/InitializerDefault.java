@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import fairyChessPack1.ControllerProxyFactory;
 import fairyChessPack1.Epifyte;
@@ -162,7 +163,44 @@ public class InitializerDefault extends MethodPiece{
 			epifyteMasterController.addRoundControlTarget(blackPawn);
 		}
 		epifyteMasterController.addRoundControlTarget(blackControllerProxy);
+		setAsComputer(blackControllerProxy);
 		RoundSignallerContinuous.beginRoundSignalLoop();
+	}
+	private static void setAsComputer(Epifyte controllerProxy) {
+		controllerProxy.setTags("CONTROLLER_PROXY", "COMPUTER_CONTROLLER");
+		controllerProxy.setRoundExecutor(() -> {
+			World.setUserInteraction(false);
+			while(true) {
+				Random rng = new Random();
+				Epifyte chessPiece = controllerProxy.getLower()
+						.get(rng.nextInt(controllerProxy.getLower().size()));
+				if(chessPiece.getTags().contains("CHESS_PIECE")) {
+					ArrayList<Epifyte> attackRange = (ArrayList<Epifyte>) chessPiece
+							.evaluateInstanceInformation("epifyteSeek attackRange").getEntry();
+					if(attackRange.isEmpty() == false) {
+						Random rng2 = new Random();
+						Epifyte targetCell = attackRange.get(rng2.nextInt(attackRange.size()));
+						chessPiece.executeCommandWithDataSet("epifyteDo attack", 
+								new DataSet(Epifyte.class, targetCell));
+						break;
+					}
+					else {
+						ArrayList<Epifyte> movementRange = (ArrayList<Epifyte>) chessPiece
+								.evaluateInstanceInformation("epifyteSeek movementRange").getEntry();
+						if(movementRange.isEmpty() == false) {
+						Random rng2 = new Random();
+						Epifyte targetCell = movementRange.get(rng2.nextInt(movementRange.size()));
+						chessPiece.executeCommandWithDataSet("epifyteDo move", 
+								new DataSet(Epifyte.class, targetCell));
+						break;
+						}
+					}
+				}
+			}
+			controllerProxy.getParentControllers().get(0).proceedToNextTarget();
+			World.setUserInteraction(true);
+			System.out.println("controllerProxy round executed");
+		});
 	}
 	private static Epifyte createCartesianSquareBoardOfDimensions(Integer width, Integer height,
 			Double displayWidth, Double displayHeight){
@@ -1312,6 +1350,11 @@ public class InitializerDefault extends MethodPiece{
 										, textureCase.getSingleLowerOfTag("TEXTURE_CASE")
 										, (EpifyteModifier) cellPresumed.evaluateInstanceInformation("epifyteSeek textureCase").getEntry());
 								Epifyte.forceDetach(originalPiece, cellPresumed);
+								Epifyte.forceDetach(originalPiece.getSingleUpperOfTag("CONTROLLER_PROXY"),
+										originalPiece);
+								RoundController originalPieceRoundController 
+								= originalPiece.getParentControllers().get(0);
+								originalPieceRoundController.getRoundControlTargets().remove(originalPiece);
 								Epifyte.forceMove(commandRoute.get(0), currentCell, cellPresumed);
 								
 								textureCase.executeCommand("update");
