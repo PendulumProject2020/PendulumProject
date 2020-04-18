@@ -108,12 +108,17 @@ public class InitializerDefault extends MethodPiece{
 		Epifyte whiteKnight2 = makeChessPiece(identityBundleWN2);
 		gamePieceSetControllerProxy(whiteKnight2, whiteControllerProxy);
 		putGamePieceOnSquareBoard(whiteKnight2, gameBoard, new Pair<Integer, Integer>(7, 1));
+		EpifyteModifier identityBundleWQ = makeIdentityBundle("Queen", "White");
+		Epifyte whiteQueen = makeChessPiece(identityBundleWQ);
+		gamePieceSetControllerProxy(whiteQueen, whiteControllerProxy);
+		putGamePieceOnSquareBoard(whiteQueen, gameBoard, new Pair<Integer, Integer>(4, 1));
 		epifyteMasterController.addRoundControlTarget(whiteRook1);
 		epifyteMasterController.addRoundControlTarget(whiteRook2);
 		epifyteMasterController.addRoundControlTarget(whiteBishop1);
 		epifyteMasterController.addRoundControlTarget(whiteBishop2);
 		epifyteMasterController.addRoundControlTarget(whiteKnight1);
 		epifyteMasterController.addRoundControlTarget(whiteKnight2);
+		epifyteMasterController.addRoundControlTarget(whiteQueen);
 		for(int i = 1; i <= 8; i++) {
 			EpifyteModifier identityBundleWP = makeIdentityBundle("Pawn", "White");
 			Epifyte whitePawn = makeChessPiece(identityBundleWP);
@@ -148,12 +153,17 @@ public class InitializerDefault extends MethodPiece{
 		Epifyte blackKnight2 = makeChessPiece(identityBundleBN2);
 		gamePieceSetControllerProxy(blackKnight2, blackControllerProxy);
 		putGamePieceOnSquareBoard(blackKnight2, gameBoard, new Pair<Integer, Integer>(7, 8));
+		EpifyteModifier identityBundleBQ = makeIdentityBundle("Queen", "Black");
+		Epifyte blackQueen = makeChessPiece(identityBundleBQ);
+		gamePieceSetControllerProxy(blackQueen, blackControllerProxy);
+		putGamePieceOnSquareBoard(blackQueen, gameBoard, new Pair<Integer, Integer>(4, 8));
 		epifyteMasterController.addRoundControlTarget(blackRook1);
 		epifyteMasterController.addRoundControlTarget(blackRook2);
 		epifyteMasterController.addRoundControlTarget(blackBishop1);
 		epifyteMasterController.addRoundControlTarget(blackBishop2);
 		epifyteMasterController.addRoundControlTarget(blackKnight1);
 		epifyteMasterController.addRoundControlTarget(blackKnight2);
+		epifyteMasterController.addRoundControlTarget(blackQueen);
 		for(int i = 1; i <= 8; i++) {
 			EpifyteModifier identityBundleBP = makeIdentityBundle("Pawn", "Black");
 			Epifyte blackPawn = makeChessPiece(identityBundleBP);
@@ -585,6 +595,12 @@ public class InitializerDefault extends MethodPiece{
 		}
 		else if(pieceType.equals("Pawn") && colorName.equals("Black")){
 			chessPieceImage = new Image("fairyChessPack1/imageFolder1/Chess_pdt60.png", 60, 60, false, false);
+		}
+		else if(pieceType.equals("Queen") && colorName.equals("White")) {
+			chessPieceImage = new Image("fairyChessPack1/imageFolder1/Chess_qlt60.png", 60, 60, false, false);
+		}
+		else if(pieceType.equals("Queen") && colorName.equals("Black")) {
+			chessPieceImage = new Image("fairyChessPack1/imageFolder1/Chess_qdt60.png", 60, 60, false, false);
 		}
 		ImageView chessPieceImageView = new ImageView(chessPieceImage);
 		EpifyteModifier textureCase = new EpifyteModifier();
@@ -1067,6 +1083,300 @@ public class InitializerDefault extends MethodPiece{
 					});
 			Epifyte.forceBind(obstructionDetector, basicMovementRange);
 			Epifyte.forceBind(basicMovementRange, chessMoveArm);
+		}
+		else if(pieceType.equals("Queen")) {
+				EpifyteModifier basicMovementRange = new EpifyteModifier();
+				basicMovementRange.setEpifyteInformationFinder((informationName, propagatedDataSet
+						, informationRoute, supportDataSet) -> {
+							if(informationName.equals("movementRange")){
+								//This should return a dataset containing an arraylist of cells
+								//The propagated dataset should also be an arraylist of cells
+							Quintuple<Map<Pair<Integer, Integer>, Epifyte>, Integer, Integer, ArrayList<Epifyte>, DataSet>
+							informationQuintuple = helper1(informationName, propagatedDataSet
+									, informationRoute, supportDataSet);
+							if(informationQuintuple == null){
+								System.out.println("informationQuintuple == null");
+								return propagatedDataSet;
+							}
+							Map<Pair<Integer, Integer>, Epifyte> coordinatesToCellMapRaw
+							= informationQuintuple.getFirst();
+							int currentX = informationQuintuple.getSecond();
+							int currentY = informationQuintuple.getThird();
+							ArrayList<Epifyte> dataSetArrayList = informationQuintuple.getFourth();
+							DataSet dataSet = informationQuintuple.getFifth();
+							//Horizontal movement
+							for(int i = 1; true; i++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(i, currentY)) == null){
+									break;
+								}
+								else if(i != currentX){
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(i, currentY)));
+								}
+							}
+							//Vertical movement
+							for(int j = 1; true; j++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX, j)) == null){
+									break;
+								}
+								else if(j != currentY){
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX, j)));
+								}
+							}
+							//Up-Left movement
+							for(int i = 1; true; i++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX - i, currentY + i)) == null){
+									break;
+								}
+								else{
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX - i, currentY + i)));
+								}
+							}
+							//Up-Right movement
+							for(int i = 1; true; i++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX + i, currentY + i)) == null){
+									break;
+								}
+								else{
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX + i, currentY + i)));
+								}
+							}
+							//Down-Left movement
+							for(int i = 1; true; i++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX - i, currentY - i)) == null){
+									break;
+								}
+								else{
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX - i, currentY - i)));
+								}
+							}
+							//Down-Right movement
+							for(int i = 1; true; i++){
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX + i, currentY - i)) == null){
+									break;
+								}
+								else{
+									dataSetArrayList.add(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX + i, currentY - i)));
+								}
+							}
+							dataSet.setEntry(dataSetArrayList);//Not sure if this line is necessary
+							if(dataSetArrayList == null){
+								System.out.println("basicMovementRange: null dataSetArrayList");
+							}
+							else if(dataSetArrayList.isEmpty()){
+								System.out.println("basicMovementRange: empty dataSetArrayList");
+							}
+							else{
+								System.out.println("basicMovementRange: non-empty dataSetArrayList");
+							}
+							return dataSet;
+							}
+							return propagatedDataSet;
+						});
+				EpifyteModifier obstructionDetector = new EpifyteModifier();
+				obstructionDetector.setEpifyteInformationFinder((informationName, propagatedDataSet
+						, informationRoute, supportDataSet) -> {
+							if(informationName.equals("movementRange")){
+								//This should return a dataset containing an arraylist of cells
+								//The propagated dataset should also be an arraylist of cells
+								Quintuple<Map<Pair<Integer, Integer>, Epifyte>, Integer, Integer, ArrayList<Epifyte>, DataSet>
+								informationQuintuple = helper1(informationName, propagatedDataSet
+										, informationRoute, supportDataSet);
+								if(informationQuintuple == null){
+									return propagatedDataSet;
+								}
+								Map<Pair<Integer, Integer>, Epifyte> coordinatesToCellMapRaw
+								= informationQuintuple.getFirst();
+								int currentX = informationQuintuple.getSecond();
+								int currentY = informationQuintuple.getThird();
+								ArrayList<Epifyte> dataSetArrayList = informationQuintuple.getFourth();
+								DataSet dataSet = informationQuintuple.getFifth();
+							//Left obstruction
+							for(int i = currentX - 1; i >= 1; i--){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(i, currentY)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(i, currentY))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; i2 >= 1; i2--){
+										if(coordinatesToCellMapRaw.get(
+												new Pair<Integer, Integer>(i2, currentY)) == null){
+												break;
+											}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(i2, currentY)));
+									}
+									break;
+								}
+							}
+							//Right obstruction
+							for(int i = currentX + 1; true; i++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(i, currentY)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(i, currentY))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; true; i2++){
+									if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(i2, currentY)) == null){
+										break;
+									}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(i2, currentY)));
+									}
+									break;
+								}
+							}
+							//Down obstruction
+							for(int j = currentY - 1; j >= 1; j--){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX, j)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX, j))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int j2 = j; j2 >= 1; j2--){
+									if(coordinatesToCellMapRaw.get(
+											new Pair<Integer, Integer>(currentX, j2)) == null){
+											break;
+										}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX, j2)));
+									}
+									break;
+								}
+							}
+							//Up obstruction
+							for(int j = currentY + 1; true; j++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX, j)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX, j))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int j2 = j; true; j2++){
+									if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX, j2)) == null){
+										break;
+									}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX, j2)));
+									}
+									break;
+								}
+							}
+							//Up-Left obstruction
+							for(int i = 1; true; i++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX - i, currentY + i)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX - i, currentY + i))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; true; i2++){
+										if(coordinatesToCellMapRaw.get(
+												new Pair<Integer, Integer>(currentX - i2, currentY + i2)) == null){
+												break;
+											}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX - i2, currentY + i2)));
+									}
+									break;
+								}
+							}
+							//Up-Right obstruction
+							for(int i = 1; true; i++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX + i, currentY + i)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX + i, currentY + i))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; true; i2++){
+										if(coordinatesToCellMapRaw.get(
+												new Pair<Integer, Integer>(currentX + i2, currentY + i2)) == null){
+												break;
+											}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX + i2, currentY + i2)));
+									}
+									break;
+								}
+							}
+							//Down-Left obstruction
+							for(int i = 1; true; i++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX - i, currentY - i)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX - i, currentY - i))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; true; i2++){
+										if(coordinatesToCellMapRaw.get(
+												new Pair<Integer, Integer>(currentX - i2, currentY - i2)) == null){
+												break;
+											}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX - i2, currentY - i2)));
+									}
+									break;
+								}
+							}
+							//Down-Right obstruction
+							for(int i = 1; true; i++){//Check if this line is correct
+								if(coordinatesToCellMapRaw.get(
+										new Pair<Integer, Integer>(currentX + i, currentY - i)) == null){
+									break;
+								}
+								if(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX + i, currentY - i))
+										.getSingleUpperOfTag("CHESS_PIECE") != null
+										){
+									for(int i2 = i; true; i2++){
+										if(coordinatesToCellMapRaw.get(
+												new Pair<Integer, Integer>(currentX + i2, currentY - i2)) == null){
+												break;
+											}
+									dataSetArrayList.remove(coordinatesToCellMapRaw
+											.get(new Pair<Integer, Integer>(currentX + i2, currentY - i2)));
+									}
+									break;
+								}
+							}
+							dataSet.setEntry(dataSetArrayList);//Not sure if this line is necessary
+							return dataSet;
+							}
+							return propagatedDataSet;
+						});
+				Epifyte.forceBind(obstructionDetector, basicMovementRange);
+				Epifyte.forceBind(basicMovementRange, chessMoveArm);
 		}
 		else if(pieceType.equals("Knight")){
 			EpifyteModifier basicMovementRange = new EpifyteModifier();
@@ -1585,6 +1895,170 @@ public class InitializerDefault extends MethodPiece{
 				Epifyte.forceBind(pieceDetector, chessAttackArm);
 			
 		}
+		else if(pieceType == "Queen"){
+			EpifyteModifier pieceDetector = new EpifyteModifier();
+			//Modification to obstructionDetector
+			pieceDetector.setEpifyteInformationFinder((informationName, propagatedDataSet
+					, informationRoute, supportDataSet) -> {
+						if(informationName.equals("attackRange")){
+							//This should return a dataset containing an arraylist of cells
+							//The propagated dataset should also be an arraylist of cells
+							Quintuple<Map<Pair<Integer, Integer>, Epifyte>, Integer, Integer, ArrayList<Epifyte>, DataSet>
+							informationQuintuple = helper1(informationName, propagatedDataSet
+									, informationRoute, supportDataSet);
+							if(informationQuintuple == null){
+								return propagatedDataSet;
+							}
+							Map<Pair<Integer, Integer>, Epifyte> coordinatesToCellMapRaw
+							= informationQuintuple.getFirst();
+							int currentX = informationQuintuple.getSecond();
+							int currentY = informationQuintuple.getThird();
+							ArrayList<Epifyte> dataSetArrayList = informationQuintuple.getFourth();
+							DataSet dataSet = informationQuintuple.getFifth();
+							ArrayList<Epifyte> newDataSetArrayList
+							= new ArrayList<Epifyte>();
+						//Left piece detection
+						for(int i = currentX - 1; i >= 1; i--){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(i, currentY)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(i, currentY))
+									.getSingleUpperOfTag("CHESS_PIECE") != null){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(i, currentY)));
+								break;
+							}
+						}
+						//Right piece detection
+						for(int i = currentX + 1; true; i++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(i, currentY)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(i, currentY))
+									.getSingleUpperOfTag("CHESS_PIECE") != null
+									){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(i, currentY)));
+								break;
+							}
+						}
+						//Down piece detection
+						for(int j = currentY - 1; j >= 1; j--){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX, j)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX, j))
+									.getSingleUpperOfTag("CHESS_PIECE") != null
+									){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX, j)));
+								break;
+							}
+						}
+						//Up piece detection
+						for(int j = currentY + 1; true; j++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX, j)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX, j))
+									.getSingleUpperOfTag("CHESS_PIECE") != null
+									){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX, j)));
+								break;
+							}
+						}
+						//Up-Left piece detection
+						for(int i = 1; true; i++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX - i, currentY + i)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX - i, currentY + i))
+									.getSingleUpperOfTag("CHESS_PIECE") != null){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX - i, currentY + i)));
+								break;
+							}
+						}
+						//Up-Right piece detection
+						for(int i = 1; true; i++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX + i, currentY + i)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX + i, currentY + i))
+									.getSingleUpperOfTag("CHESS_PIECE") != null){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX + i, currentY + i)));
+								break;
+							}
+						}
+						//Down-Left piece detection
+						for(int i = 1; true; i++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX - i, currentY - i)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX - i, currentY - i))
+									.getSingleUpperOfTag("CHESS_PIECE") != null){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX - i, currentY - i)));
+								break;
+							}
+						}
+						//Down-Right piece detection
+						for(int i = 1; true; i++){//Check if this line is correct
+							if(coordinatesToCellMapRaw.get(
+									new Pair<Integer, Integer>(currentX + i, currentY - i)) == null){
+								break;
+							}
+							if(coordinatesToCellMapRaw
+									.get(new Pair<Integer, Integer>(currentX + i, currentY - i))
+									.getSingleUpperOfTag("CHESS_PIECE") != null){
+								newDataSetArrayList.add(coordinatesToCellMapRaw
+										.get(new Pair<Integer, Integer>(currentX + i, currentY - i)));
+								break;
+							}
+						}
+						dataSet.setEntry(newDataSetArrayList);
+						return dataSet;
+						}
+						return propagatedDataSet;
+					});
+			EpifyteModifier enemyIdentifier = new EpifyteModifier();
+			enemyIdentifier.setEpifyteInformationFinder((informationName, propagatedDataSet
+					, informationRoute, supportDataSet) -> {
+					if(informationName.equals("attackRange")){
+						ArrayList<Epifyte> cellList = (ArrayList<Epifyte>) propagatedDataSet.getEntry();
+						EpifyteModifier controllerProxy = (EpifyteModifier) informationRoute.get(0)
+								.evaluateInstanceInformation("epifyteSeek controllerProxy").getEntry(); 
+						Iterator<Epifyte> iterator = cellList.iterator();
+						while(iterator.hasNext()){
+							Epifyte cell = iterator.next();
+							if(controllerProxy.getLower().contains(cell.getSingleUpperOfTag("CHESS_PIECE"))){
+								iterator.remove();
+							}
+							
+						}
+						return new DataSet(ArrayList.class, cellList);
+					}
+					return propagatedDataSet;
+				});
+			Epifyte.forceBind(enemyIdentifier, pieceDetector);
+			Epifyte.forceBind(pieceDetector, chessAttackArm);
+			}
 		if(pieceType == "Knight"){
 			EpifyteModifier pieceDetector = new EpifyteModifier();
 			//Modification to obstructionDetector
