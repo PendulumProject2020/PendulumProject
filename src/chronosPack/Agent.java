@@ -32,6 +32,11 @@ public class Agent extends ObjectPiece{
 		return clone;
 	}
 	
+	public static Agent makeDetachedClone(Agent agent) {
+		Agent clone = (Agent) ObjectPiece.makeClone(agent);
+		return clone;
+	}
+	
 	public static String getVersionName(){
 		return "0.0.5 Official Pre-release";
 	}

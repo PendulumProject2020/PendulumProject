@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class Epifyte extends Agent{
 	}
 	
 	public static Epifyte makeClone(Epifyte epifyte){
-		Epifyte clone = (Epifyte) Agent.makeClone(epifyte);
+		Epifyte clone = (Epifyte) Agent.makeDetachedClone(epifyte);
 		clone.setLabel(epifyte.getLabel());
 		ArrayList<String> cloneTags = new ArrayList<String>(epifyte.getTags());
 		clone.setTags(cloneTags);
@@ -53,6 +54,32 @@ public class Epifyte extends Agent{
 		clone.setCommandPropagationPermissionJudge(epifyte.getCommandPropagationPermissionJudge());
 		clone.setInformationPropagationPermissionJudge(epifyte.getInformationPropagationPermissionJudge());
 		return clone;
+	}
+	
+	public static Map<Epifyte, Epifyte> makeCloneIsomorphism(ArrayList<Epifyte> epifyteGraph){
+		Map<Epifyte, Epifyte> isomorphism = new HashMap<Epifyte, Epifyte>();
+		for(Epifyte epifyte : epifyteGraph) {
+			if(EpifyteArm.class.isAssignableFrom(epifyte.getActualClass())) {
+				EpifyteArm clone = EpifyteArm.makeClone((EpifyteArm) epifyte);
+				isomorphism.put(epifyte, clone);
+			}
+			else if(EpifyteModifier.class.isAssignableFrom(epifyte.getActualClass())) {
+				EpifyteModifier clone = EpifyteModifier.makeClone((EpifyteModifier) epifyte);
+				isomorphism.put(epifyte, clone);
+			}
+			else {
+				Epifyte clone = Epifyte.makeClone(epifyte);
+				isomorphism.put(epifyte, clone);
+			}
+		}
+		for(Epifyte epifyte : epifyteGraph) {
+			Epifyte clone = isomorphism.get(epifyte);
+			for(Epifyte lowerEpifyte : epifyte.getLower()) {
+				Epifyte lowerClone = isomorphism.get(lowerEpifyte);
+				Epifyte.forceBind(clone, lowerClone);
+			}
+		}
+		return isomorphism;
 	}
 	
 	/*public Epifyte makeCopy(){//To be overridden

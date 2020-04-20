@@ -32,6 +32,12 @@ public class EpifyteModifier extends Epifyte{
 		this.setDefaultEpifyteInformationFinder();
 	}
 	
+	public static EpifyteModifier makeClone(EpifyteModifier epifyteModifier){
+		EpifyteModifier clone = (EpifyteModifier) Epifyte.makeClone(epifyteModifier);
+		clone.setEpifyteInformationFinder(epifyteModifier.getEpifyteInformationFinder());
+		return clone;
+	}
+	
 	public static String getVersionName(){
 		return "0.0.5 Official Pre-release";
 	}

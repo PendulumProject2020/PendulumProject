@@ -30,6 +30,12 @@ public class EpifyteArm extends EpifyteModifier{
 		this.setDefaultEpifyteInformationFinder();
 	}
 	
+	public static EpifyteArm makeClone(EpifyteArm epifyteArm){
+		EpifyteArm clone = (EpifyteArm) EpifyteModifier.makeClone(epifyteArm);
+		clone.setEpifyteCommandHandler(epifyteArm.getEpifyteCommandHandler());
+		return clone;
+	}
+	
 	public static String getVersionName(){
 		return "0.0.5 Official Pre-release";
 	}

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import fairyChessPack1.ControllerProxyFactory;
 import fairyChessPack1.Epifyte;
@@ -192,6 +193,7 @@ public class InitializerDefault extends MethodPiece{
 						Epifyte targetCell = attackRange.get(rng2.nextInt(attackRange.size()));
 						chessPiece.executeCommandWithDataSet("epifyteDo attack", 
 								new DataSet(Epifyte.class, targetCell));
+						
 						break;
 					}
 					else {
@@ -207,6 +209,7 @@ public class InitializerDefault extends MethodPiece{
 					}
 				}
 			}
+			
 			controllerProxy.getParentControllers().get(0).proceedToNextTarget();
 			World.setUserInteraction(true);
 			System.out.println("controllerProxy round executed");
