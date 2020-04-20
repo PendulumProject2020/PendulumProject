@@ -45,6 +45,7 @@ public class InitializerDefault extends MethodPiece{
 	private static EpifyteModifier blackControllerProxy;
 	private static FairyChessApplication fairyChessApplication;
 	private static Epifyte gameBoard;
+	private static Map<String, Epifyte> intangibleDictionary = new HashMap<String, Epifyte>();
 	private static RoundController epifyteMasterController = new RoundController();
 	public static ArrayList<SlotPath> getPossibleFits(){
 		ArrayList<String> hostPath = new ArrayList<String>(Arrays.asList("Chronos"));
@@ -79,6 +80,7 @@ public class InitializerDefault extends MethodPiece{
 		Application.launch(FairyChessApplication.class, (String[]) null);
 	}
 	public static void initialize2(){
+		establishMoveSimulator();
 		setWhiteControllerProxy(ControllerProxyFactory.makeControllerProxy("White"));
 		whiteControllerProxy.setDataSet("frontDirection", new DataSet(Integer.class, 1));
 		setBlackControllerProxy(ControllerProxyFactory.makeControllerProxy("Black"));
@@ -416,6 +418,45 @@ public class InitializerDefault extends MethodPiece{
 			get(InitializerDefault.class).put("squareBoardReference", 
 							new DataSet(Epifyte.class, squareBoard));
 		return squareBoard;
+	}
+	private static void establishMoveSimulator() {
+		Epifyte base = new Epifyte();
+		EpifyteModifier apparatus = new EpifyteModifier();
+		apparatus.setEpifyteInformationFinder((informationName, propagatedDataSet
+					, informationRoute, supportDataSet) -> {
+						if(informationName.equals("simulateMove")) {
+							Epifyte recipient = (Epifyte) supportDataSet.getDataSubsets()
+									.get("recipient").getEntry();
+							String command = (String) supportDataSet.getDataSubsets()
+									.get("command").getEntry();
+							Epifyte lowest = (Epifyte) supportDataSet.getDataSubsets()
+									.get("lowest").getEntry();
+							DataSet target = supportDataSet.getDataSubsets()
+									.get("target");
+							ArrayList<Epifyte> epifyteGraph = new ArrayList<Epifyte>(Arrays.asList(lowest));
+							ArrayList<Epifyte> currentLayer = new ArrayList<Epifyte>();
+							ArrayList<Epifyte> nextLayer = new ArrayList<Epifyte>(Arrays.asList(lowest));
+							while(nextLayer.isEmpty() == false) {
+								epifyteGraph.addAll(nextLayer);
+								currentLayer = new ArrayList<Epifyte>(nextLayer);
+								nextLayer = new ArrayList<Epifyte>();
+								for(Epifyte epifyte : currentLayer) {
+									for(Epifyte upperEpifyte : epifyte.getUpper()) {
+										nextLayer.add(upperEpifyte);
+									}
+								}
+							}
+							Map<Epifyte, Epifyte> isomorphism = Epifyte.makeCloneIsomorphism(epifyteGraph);
+							isomorphism.get(recipient)
+								.executeCommandWithDataSet("epifyteDo" + command, target);
+							return new DataSet(Map.class, isomorphism);
+						}
+						else {
+							return propagatedDataSet;
+						}
+					});
+		Epifyte.forceBind(apparatus, base);
+		InitializerDefault.intangibleDictionary.put("moveSimulator", base);
 	}
 	private static void putGamePieceOnSquareBoard(Epifyte gamePiece, Epifyte squareBoard, 
 			Pair<Integer, Integer> coordinates){
@@ -2302,6 +2343,14 @@ public class InitializerDefault extends MethodPiece{
 
 	public static void setEpifyteMasterController(RoundController epifyteMasterController) {
 		InitializerDefault.epifyteMasterController = epifyteMasterController;
+	}
+
+	public static Map<String, Epifyte> getIntangibleDictionary() {
+		return intangibleDictionary;
+	}
+
+	public static void setIntangibleDictionary(Map<String, Epifyte> intangibleDictionary) {
+		InitializerDefault.intangibleDictionary = intangibleDictionary;
 	}
 
 }
