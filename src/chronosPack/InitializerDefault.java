@@ -1770,7 +1770,11 @@ public class InitializerDefault extends MethodPiece{
 									controllerProxy.getDataSet("frontDirection").getEntry();
 							Epifyte specialMoveCell = coordinatesToCellMapRaw.get(
 									new Pair<Integer, Integer>(currentX, currentY + 2*frontDirection));
-							if(specialMoveCell != null && specialMoveCell.getSingleUpperOfTag("CHESS_PIECE") == null) {
+							if(specialMoveCell != null 
+									&& specialMoveCell.getSingleUpperOfTag("CHESS_PIECE") == null
+									&& coordinatesToCellMapRaw.get(
+											new Pair<Integer, Integer>(currentX, currentY + 1*frontDirection))
+									.getSingleUpperOfTag("CHESS_PIECE") == null) {
 								dataSetArrayList.add(specialMoveCell);
 							}
 						dataSet.setEntry(dataSetArrayList);//Not sure if this line is necessary
