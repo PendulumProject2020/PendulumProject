@@ -494,9 +494,157 @@ public class InitializerDefault extends MethodPiece{
 							//Interprets as the player intending to move this piece
 							EpifyteDisplayEventInterpreter.setSelectedEpifytes(
 								new ArrayList<Epifyte>(Arrays.asList(chessPiece)));
+							ArrayList<Epifyte> movementRange
+							= (ArrayList<Epifyte>) 
+							chessPiece.evaluateInstanceInformation("epifyteSeek movementRange").getEntry();
+							if(PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("movementTemporaryDisplay") != null) {
+							ArrayList<Node> movementDisplayList = 
+									(ArrayList<Node>) PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("movementTemporaryDisplay").presentAsArrayList();
+							
+								for(Node node : movementDisplayList) {
+									fairyChessApplication.getRoot().getChildren().remove(node);
+									System.out.println("Node removed.");
+								}
+							}
+							PieceTreeCompiler.getPieceClassToStaticNamedDataSupersetMap()
+							.get(InitializerDefault.class)
+							.putIfAbsent("movementTemporaryDisplay", 
+									new DataSet(ArrayList.class, new ArrayList<Node>()));
+							ArrayList<Node> movementDisplayList = new ArrayList<Node>();
+							for(Epifyte movementRangeCell : movementRange) {
+								Rectangle temporaryDisplay = new Rectangle();
+								temporaryDisplay.setFill(Color.web("#ffff66", 0.5));
+								Pair<Double, Double> realDisplayCoordinates = 
+										(Pair<Double, Double>) movementRangeCell
+										.evaluateInstanceInformation("epifyteSeek realDisplayCoordinates")
+										.getEntry();
+								
+								Double cellHeight = 
+										(Double) movementRangeCell
+										.evaluateInstanceInformation("epifyteSeek cellHeight")
+										.getEntry();
+								temporaryDisplay.setHeight(cellHeight);
+								Double cellWidth = 
+										(Double) movementRangeCell
+										.evaluateInstanceInformation("epifyteSeek cellWidth")
+										.getEntry();
+								temporaryDisplay.setWidth(cellWidth);
+								temporaryDisplay.setX(realDisplayCoordinates.getFirst() - 0.5*cellWidth);
+								temporaryDisplay.setY(-realDisplayCoordinates.getSecond() - 0.5*cellHeight);
+								temporaryDisplay.addEventHandler(MouseEvent.MOUSE_CLICKED
+										, new EventHandler<MouseEvent>()
+								{
+									@Override
+									public void handle(MouseEvent arg0) {
+										// TODO Auto-generated method stub
+										System.out.println("Click detected.");
+										EpifyteDisplayEventInterpreter.executeConverter(movementRangeCell
+												, arg0, null);
+									}
+								});
+								fairyChessApplication.getRoot().getChildren().add(temporaryDisplay);
+								System.out.println("Temporary Display added.");
+								movementDisplayList.add(temporaryDisplay);
+								temporaryDisplay.setVisible(true);
+							}
+							PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.put("movementTemporaryDisplay", 
+											new DataSet(ArrayList.class, movementDisplayList));
+							ArrayList<Epifyte> attackRange
+							= (ArrayList<Epifyte>) 
+							chessPiece.evaluateInstanceInformation("epifyteSeek attackRange").getEntry();
+							if(PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("attackTemporaryDisplay") != null) {
+							ArrayList<Node> attackDisplayList = 
+									(ArrayList<Node>) PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("attackTemporaryDisplay").presentAsArrayList();
+							
+								for(Node node : attackDisplayList) {
+									fairyChessApplication.getRoot().getChildren().remove(node);
+									System.out.println("Node removed.");
+								}
+							}
+							PieceTreeCompiler.getPieceClassToStaticNamedDataSupersetMap()
+							.get(InitializerDefault.class)
+							.putIfAbsent("attackTemporaryDisplay", 
+									new DataSet(ArrayList.class, new ArrayList<Node>()));
+							ArrayList<Node> attackDisplayList = new ArrayList<Node>();
+							for(Epifyte attackRangeCell : attackRange) {
+								Rectangle temporaryDisplay = new Rectangle();
+								temporaryDisplay.setFill(Color.web("#ff9966", 0.5));
+								Pair<Double, Double> realDisplayCoordinates = 
+										(Pair<Double, Double>) attackRangeCell
+										.evaluateInstanceInformation("epifyteSeek realDisplayCoordinates")
+										.getEntry();
+								
+								Double cellHeight = 
+										(Double) attackRangeCell
+										.evaluateInstanceInformation("epifyteSeek cellHeight")
+										.getEntry();
+								temporaryDisplay.setHeight(cellHeight);
+								Double cellWidth = 
+										(Double) attackRangeCell
+										.evaluateInstanceInformation("epifyteSeek cellWidth")
+										.getEntry();
+								temporaryDisplay.setWidth(cellWidth);
+								temporaryDisplay.setX(realDisplayCoordinates.getFirst() - 0.5*cellWidth);
+								temporaryDisplay.setY(-realDisplayCoordinates.getSecond() - 0.5*cellHeight);
+								temporaryDisplay.addEventHandler(MouseEvent.MOUSE_CLICKED
+										, new EventHandler<MouseEvent>()
+								{
+									@Override
+									public void handle(MouseEvent arg0) {
+										// TODO Auto-generated method stub
+										System.out.println("Click detected.");
+										EpifyteDisplayEventInterpreter.executeConverter(attackRangeCell
+												, arg0, null);
+									}
+								});
+								fairyChessApplication.getRoot().getChildren().add(temporaryDisplay);
+								System.out.println("Temporary Display added.");
+								attackDisplayList.add(temporaryDisplay);
+								temporaryDisplay.setVisible(true);
+							}
+							PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.put("attackTemporaryDisplay", 
+											new DataSet(ArrayList.class, attackDisplayList));
 							event.consume();
 							}
 							else{
+								if(PieceTreeCompiler.
+										getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+										.get("movementTemporaryDisplay") != null) {
+								ArrayList<Node> movementDisplayList = 
+										(ArrayList<Node>) PieceTreeCompiler.
+										getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+										.get("movementTemporaryDisplay").presentAsArrayList();
+								
+									for(Node node : movementDisplayList) {
+										fairyChessApplication.getRoot().getChildren().remove(node);
+										System.out.println("Node removed.");
+									}
+								}
+								if(PieceTreeCompiler.
+										getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+										.get("attackTemporaryDisplay") != null) {
+								ArrayList<Node> attackDisplayList = 
+										(ArrayList<Node>) PieceTreeCompiler.
+										getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+										.get("attackTemporaryDisplay").presentAsArrayList();
+								
+									for(Node node : attackDisplayList) {
+										fairyChessApplication.getRoot().getChildren().remove(node);
+										System.out.println("Node removed.");
+									}
+								}
 								Epifyte attackingPiece = EpifyteDisplayEventInterpreter.getSelectedEpifytes().get(0);
 								
 								ArrayList<Epifyte> attackRange
@@ -548,6 +696,32 @@ public class InitializerDefault extends MethodPiece{
 							ArrayList<Epifyte> attackRange
 							= (ArrayList<Epifyte>) 
 							chessPiece.evaluateInstanceInformation("epifyteSeek attackRange").getEntry();
+							if(PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("movementTemporaryDisplay") != null) {
+							ArrayList<Node> movementDisplayList = 
+									(ArrayList<Node>) PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("movementTemporaryDisplay").presentAsArrayList();
+							
+								for(Node node : movementDisplayList) {
+									fairyChessApplication.getRoot().getChildren().remove(node);
+									System.out.println("Node removed.");
+								}
+							}
+							if(PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("attackTemporaryDisplay") != null) {
+							ArrayList<Node> attackDisplayList = 
+									(ArrayList<Node>) PieceTreeCompiler.
+									getPieceClassToStaticNamedDataSupersetMap().get(InitializerDefault.class)
+									.get("attackTemporaryDisplay").presentAsArrayList();
+							
+								for(Node node : attackDisplayList) {
+									fairyChessApplication.getRoot().getChildren().remove(node);
+									System.out.println("Node removed.");
+								}
+							}
 							if(movementRange.contains(cell)){
 								System.out.println("chessPiece beginning move command");
 								chessPiece.executeCommandWithDataSet(
